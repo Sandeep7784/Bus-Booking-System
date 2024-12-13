@@ -1,27 +1,16 @@
 import React from 'react';
 
-const BusCard = ({ bus, onBookSeat }) => {
-  const { bus_name, route, total_seats, current_occupancy, eta, bus_id } = bus;
-  const occupancyPercentage = (current_occupancy / total_seats) * 100;
-
-  // Set seat availability color
-  let seatStatus = 'green';
-  if (occupancyPercentage > 60 && occupancyPercentage < 90) {
-    seatStatus = 'yellow';
-  } else if (occupancyPercentage >= 90) {
-    seatStatus = 'red';
-  }
+const BusCard = ({ bus }) => {
+  const { bus_name, total_seats, current_occupancy, schedule_time } = bus;
 
   return (
-    <div className="bus-card">
-      <h3>{bus_name}</h3>
-      <p>Route: {route}</p>
-      <p>ETA: {eta}</p>
-      <p>Available Seats: {total_seats - current_occupancy}</p>
-      <p style={{ color: seatStatus }}>
-        {occupancyPercentage < 60 ? 'Seats Available' : occupancyPercentage < 90 ? 'Seats Filling' : 'Limited Availability'}
-      </p>
-      <button onClick={() => onBookSeat(bus_id)}>Book Seat</button>
+    <div className="bg-white shadow-lg rounded-lg p-4 mb-4">
+      <h2 className="text-xl font-semibold">{bus_name}</h2>
+      <p className="text-gray-600">Seats Available: {total_seats - current_occupancy}</p>
+      <p className="text-gray-600">Schedule: {schedule_time}</p>
+      <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        Book Now
+      </button>
     </div>
   );
 };

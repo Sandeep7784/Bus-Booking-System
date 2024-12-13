@@ -1,29 +1,66 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Header from "./components/Header";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Admin from "./pages/Admin";
-import Booking from "./pages/Booking";
-import './styles.css';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import AdminDashboard from './pages/AdminDashboard';
+import BusManagementPage from './pages/BusManagementPage';
+import CreateAdminPage from './pages/CreateAdminPage'; // For admin to create new admins
 
 const App = () => {
+  const [role, setRole] = useState(null);
+
+  // Move role check into useEffect to avoid direct state updates
+  useEffect(() => {
+    const role = getRoleFromLocalStorage();
+    if (role) {
+      setRole(role);
+    }
+  }, []);
+
+  const getRoleFromLocalStorage = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode JWT
+      return decodedToken.role;  // Assuming role is embedded in the JWT payload
+    }
+    return null;
+  };
+
+  const renderHomePage = () => {
+    if (role === 'admin') {
+      return <Navigate to="/admin" />;
+    } else if (role === 'user') {
+      return <HomePage />;
+    } else {
+      return <Navigate to="/login" />;
+    }
+  };
+
+  // Updated to use element prop instead of render/component
   return (
     <Router>
-      <div>
-        <Header />
-        <div className="container">
-          <Routes>
-            {/* Define Routes for different pages */}
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/booking/:busId" element={<Booking />} />
-          </Routes>
-        </div>
-      </div>
+      <Header role={role} />
+      <main className="py-8">
+        <Routes>
+          <Route path="/" element={renderHomePage()} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/admin" element={
+            role === 'admin' ? <AdminDashboard /> : <Navigate to="/login" />
+          } />
+          <Route path="/admin/buses" element={
+            role === 'admin' ? <BusManagementPage /> : <Navigate to="/login" />
+          } />
+          <Route path="/admins/create" element={
+            role === 'admin' ? <CreateAdminPage /> : <Navigate to="/login" />
+          } />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </main>
+      <Footer />
     </Router>
   );
 };

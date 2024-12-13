@@ -3,12 +3,15 @@ const Bus = require('../models/busModel');
 // Create a new bus
 exports.createBus = async (req, res) => {
   try {
-    const { bus_name, total_seats, route_id } = req.body;
+    const { bus_name, total_seats, route_id, days_of_operation, schedule_time } = req.body;
 
+    // Create a new bus and include days_of_operation and schedule_time
     const newBus = await Bus.create({
       bus_name,
       total_seats,
       route_id,
+      days_of_operation: days_of_operation || 'Monday, Saturday, Thursday', // Default value
+      schedule_time: schedule_time || '09:00:00', // Default value
     });
 
     res.status(201).json({ message: 'Bus created successfully', bus: newBus });
@@ -33,7 +36,7 @@ exports.getAllBuses = async (req, res) => {
 exports.updateBus = async (req, res) => {
   try {
     const { bus_id } = req.params;
-    const { bus_name, total_seats, route_id } = req.body;
+    const { bus_name, total_seats, route_id, days_of_operation, schedule_time } = req.body;
 
     const bus = await Bus.findByPk(bus_id);
     if (!bus) {
@@ -43,6 +46,8 @@ exports.updateBus = async (req, res) => {
     bus.bus_name = bus_name || bus.bus_name;
     bus.total_seats = total_seats || bus.total_seats;
     bus.route_id = route_id || bus.route_id;
+    bus.days_of_operation = days_of_operation || bus.days_of_operation; // Update days of operation if provided
+    bus.schedule_time = schedule_time || bus.schedule_time; // Update schedule time if provided
 
     await bus.save();
 
@@ -67,40 +72,5 @@ exports.deleteBus = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error deleting bus' });
-  }
-};
-
-// Create bus details (schedule, days of operation)
-exports.createBusDetails = async (req, res) => {
-  try {
-    const { bus_id, days_of_operation, schedule_time } = req.body;
-
-    const busDetails = await BusDetails.create({
-      bus_id,
-      days_of_operation,
-      schedule_time,
-    });
-
-    res.status(201).json({ message: 'Bus details created successfully', busDetails });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error creating bus details' });
-  }
-};
-
-// Get bus details by bus id
-exports.getBusDetails = async (req, res) => {
-  try {
-    const { bus_id } = req.params;
-    const busDetails = await BusDetails.findOne({ where: { bus_id } });
-
-    if (!busDetails) {
-      return res.status(404).json({ message: 'Bus details not found' });
-    }
-
-    res.status(200).json(busDetails);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error fetching bus details' });
   }
 };
