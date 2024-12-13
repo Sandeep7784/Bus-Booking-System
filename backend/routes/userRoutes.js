@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, getAllUsers, deleteUser, updateUserRole} = require('../controllers/userController');
+const { registerUser, loginUser, getAllUsers, deleteUser, updateUserRole, sendProfile} = require('../controllers/userController');
 const { isAuthenticated, isAdmin } = require('../middleware/authMiddleware');  
 const router = express.Router();
 
@@ -17,5 +17,8 @@ router.get('/get_all_users', isAuthenticated, isAdmin, getAllUsers);
 
 // Delete a user (Admin only)
 router.delete('/:user_id', isAuthenticated, isAdmin, deleteUser);
+
+// Get user profile route - Extracts user details from JWT token in header
+router.get('/profile', sendProfile);
 
 module.exports = router;

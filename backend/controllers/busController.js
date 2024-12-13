@@ -48,7 +48,7 @@ exports.updateBus = async (req, res) => {
     bus.route_id = route_id || bus.route_id;
     bus.days_of_operation = days_of_operation || bus.days_of_operation; // Update days of operation if provided
     bus.schedule_time = schedule_time || bus.schedule_time; // Update schedule time if provided
-
+    
     await bus.save();
 
     res.status(200).json({ message: 'Bus updated successfully', bus });
@@ -72,5 +72,43 @@ exports.deleteBus = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error deleting bus' });
+  }
+};
+
+// Get bus details by ID
+exports.getBusById = async (req, res) => {
+  try {
+    const { bus_id } = req.params;
+    const bus = await Bus.findByPk(bus_id);
+    if (!bus) {
+      return res.status(404).json({ message: 'Bus not found' });
+    }
+
+    res.status(200).json(bus);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching bus details' });
+  }
+};
+
+exports.updateBusPartially = async (req, res) => {
+  try {
+    const { bus_id } = req.params;
+    const { current_occupancy } = req.body;
+
+    const bus = await Bus.findByPk(bus_id);
+    if (!bus) {
+      return res.status(404).json({ message: 'Bus not found' });
+    }
+
+    if (current_occupancy !== undefined) {
+      bus.current_occupancy += current_occupancy; // Increment or decrement occupancy
+    }
+
+    await bus.save();
+    res.status(200).json({ message: 'Bus updated successfully', bus });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error updating bus' });
   }
 };

@@ -84,6 +84,17 @@ export const fetchBuses = async () => {
   }
 };
 
+// API function to fetch user profile
+export const getUserProfile = async () => {
+  try {
+    const response = await axiosInstance.get('/users/profile');
+    // console.log(response.data);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : 'Error fetching user profile';
+  }
+};
+
 // API function to fetch bus details
 export const fetchBusDetails = async (bus_id) => {
   try {
@@ -97,32 +108,53 @@ export const fetchBusDetails = async (bus_id) => {
 // API function to create a booking
 export const bookSeat = async (user_id, bus_id, seat_number, stop_id) => {
   try {
-    const response = await axiosInstance.post('/bookings/book', {
+    // First create the booking
+    const bookingResponse = await axiosInstance.post('/bookings/book', {
       user_id,
       bus_id,
       seat_number,
       stop_id,
     });
-    return response.data;
+
+    // Update the current_occupancy directly
+    await axiosInstance.patch(`/buses/${bus_id}`, {
+      current_occupancy: 1, // Increment the occupancy
+    });
+    window.location.reload();
+    return bookingResponse.data;
+
   } catch (error) {
     throw error.response ? error.response.data : 'Error booking seat';
   }
 };
 
+
 // API function to cancel a booking
 export const cancelBooking = async (booking_id) => {
   try {
+    // First, get the booking details to extract the bus_id
+    const bookingResponse = await axiosInstance.get(`/bookings/${booking_id}`);
+    const bus_id = bookingResponse.data.bus_id;
+
+    // Cancel the booking
     const response = await axiosInstance.delete(`/bookings/${booking_id}`);
+
+    // Update the current_occupancy directly
+    await axiosInstance.patch(`/buses/${bus_id}`, {
+      current_occupancy: -1, // Decrement the occupancy
+    });
+
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : 'Error canceling booking';
   }
 };
 
+
 // API function to fetch trips for a specific user
-export const fetchUserTrips = async (user_id) => {
+export const fetchUserBookings = async (user_id) => {
   try {
-    const response = await axiosInstance.get(`/trips/${user_id}`);
+    const response = await axiosInstance.get(`/bookings/${user_id}`);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : 'Error fetching user trips';

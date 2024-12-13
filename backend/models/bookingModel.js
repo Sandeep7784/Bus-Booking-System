@@ -30,6 +30,6 @@ const Booking = sequelize.define('bookings', {
     type: DataTypes.STRING,
     defaultValue: 'booked',
   },
-}, {});
+}, {timestamps: false, });
 
 module.exports = Booking;

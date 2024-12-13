@@ -69,7 +69,8 @@ const BusManagementPage = () => {
       const busesData = await fetchBuses(); // Refresh bus list
       setBuses(busesData);
     } catch (err) {
-      setError('Error deleting bus');
+      // setError('Error deleting bus');
+      window.location.reload();
     }
   };
 

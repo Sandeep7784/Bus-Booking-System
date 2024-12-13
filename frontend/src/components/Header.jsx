@@ -21,7 +21,19 @@ const Header = ({ role }) => {
               </>
             ) : null}
             <li><Link to="/login" className="hover:text-gray-300">Login</Link></li>
-            {role && <li><button className="hover:text-gray-300" onClick={() => localStorage.removeItem('token')}>Logout</button></li>}
+            {role && (
+              <li>
+                <button 
+                  className="hover:text-gray-300"
+                  onClick={() => {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login'; // Navigate to login page
+                  }}
+                >
+                  Logout
+                </button>
+              </li>
+            )}
           </ul>
         </nav>
       </div>

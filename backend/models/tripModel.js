@@ -26,6 +26,6 @@ const Trip = sequelize.define('trips', {
     type: DataTypes.STRING,
     defaultValue: 'booked',
   },
-}, {});
+}, {timestamps: false,});
 
 module.exports = Trip;

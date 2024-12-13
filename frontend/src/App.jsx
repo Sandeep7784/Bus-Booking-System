@@ -8,34 +8,36 @@ import RegisterPage from './pages/RegisterPage';
 import AdminDashboard from './pages/AdminDashboard';
 import BusManagementPage from './pages/BusManagementPage';
 import CreateAdminPage from './pages/CreateAdminPage'; // For admin to create new admins
+import UserTrips from './pages/UserTrips';
+import UserProfilePage from './pages/UserProfilePage';
 
 const App = () => {
   const [role, setRole] = useState(null);
 
   // Move role check into useEffect to avoid direct state updates
   useEffect(() => {
+    const getRoleFromLocalStorage = () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode JWT
+        return decodedToken.role;  // Assuming role is embedded in the JWT payload
+      }
+      return null;
+    };
+
     const role = getRoleFromLocalStorage();
     if (role) {
       setRole(role);
     }
   }, []);
 
-  const getRoleFromLocalStorage = () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode JWT
-      return decodedToken.role;  // Assuming role is embedded in the JWT payload
-    }
-    return null;
-  };
-
   const renderHomePage = () => {
     if (role === 'admin') {
       return <Navigate to="/admin" />;
-    } else if (role === 'user') {
-      return <HomePage />;
+    } else if (role === null) {
+      return <Navigate to="/register" />;
     } else {
-      return <Navigate to="/login" />;
+      return <HomePage />;
     }
   };
 
@@ -57,7 +59,8 @@ const App = () => {
           <Route path="/admins/create" element={
             role === 'admin' ? <CreateAdminPage /> : <Navigate to="/login" />
           } />
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="/bookings" element={<UserTrips />} />
+          <Route path="/profile" element={<UserProfilePage />} />
         </Routes>
       </main>
       <Footer />

@@ -16,11 +16,13 @@ const LoginPage = () => {
       const response = await loginUser(email, password);
       // Check if login was successful before navigating
       if (response && response.success) {
-        navigate("/", { replace: true }); // Added replace:true to ensure navigation works
+        navigate("/admin", { replace: true }); // Added replace:true to ensure navigation works
       } else {
-        setError("Login failed. Please try again.");
+        navigate("/admin", { replace: true });
+        // window.location.reload();
       }
     } catch (err) {
+      navigate("/admin", { replace: true });
       console.error("Login error:", err); // Added error logging
       setError("Invalid credentials");
     }

@@ -53,3 +53,14 @@ exports.getAllBookings = async (req, res) => {
     res.status(500).json({ message: 'Error fetching bookings' });
   }
 };
+
+exports.getUserBookings = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const bookings = await Booking.findAll({ where: { user_id } });
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching bookings' });
+  }
+};
